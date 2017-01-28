@@ -20,7 +20,7 @@
 
         <h:form>
             <p:fileUpload fileUploadListener="#{fileUploadView.handleFileUpload}" mode="advanced" dragDropSupport="false"
-                          update="messages"  fileLimit="3" allowTypes="/(\.|\/)(txt)$/" />
+                          update="messages"  fileLimit="1" allowTypes="/(\.|\/)(txt)$/" auto="true" />
 
             <p:growl id="messages" showDetail="true" />
         </h:form>
