@@ -9,10 +9,21 @@
     </h:head>
     <h:body>
 
-        <p:button outcome="/index" value="Bookmark" icon="ui-icon-star">
-            <f:param name="productId" value="10" />
-        </p:button>
+        <h:form>
+            <h:panelGrid columns="4" cellpadding="5">
+                <h:outputLabel for="name" value="Name:" style="font-weight:bold" />
+                <p:inputText id="name" value="#{basicView.text}" />
+                <p:commandButton value="Submit" update="display" icon="ui-icon-check" />
+                <h:outputText id="display" value="#{basicView.text}" />
+            </h:panelGrid>
+        </h:form>
 
+        <h:form>
+            <p:fileUpload fileUploadListener="#{fileUploadView.handleFileUpload}" mode="advanced" dragDropSupport="false"
+                          update="messages"  fileLimit="3" allowTypes="/(\.|\/)(txt)$/" />
+
+            <p:growl id="messages" showDetail="true" />
+        </h:form>
     </h:body>
 </html>
 
