@@ -180,6 +180,7 @@
             <scope>test</scope>
         </dependency>
     </dependencies>
+    
     <!-- Information for compiling, testing and packaging are define here -->
     <build>
         <testResources>
