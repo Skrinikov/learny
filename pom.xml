@@ -179,6 +179,13 @@
             <version>2.7</version>
             <scope>test</scope>
         </dependency>
+        <dependency>
+            <groupId>com.semantria</groupId>
+            <artifactId>SemantriaJavaSDK</artifactId>
+            <version>4.2.92</version>            
+            <scope>system</scope>
+            <systemPath>${project.basedir}/src/main/resources/SemantriaJavaSDK-4.2.92-jar-with-dependencies.jar</systemPath>
+        </dependency>
     </dependencies>
     
     <!-- Information for compiling, testing and packaging are define here -->
