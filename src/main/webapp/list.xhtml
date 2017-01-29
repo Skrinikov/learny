@@ -1,0 +1,39 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:b="http://bootsfaces.net/ui"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      style="height:100%;">
+    <h:head>
+        <title>Lame Title</title>
+        <h:outputStylesheet name="css/bootstrap.css"/>
+
+    </h:head>
+    <h:body styleClass="bodyClass" style="height:100%;">
+
+        <b:navBar brand="Learny" brandHref="index.xhtml" styleClass="navbar navbar-default">
+            <b:navbarLinks pull="right">
+                <b:navLink value="About Us" href="list.xhtml">
+
+                </b:navLink>
+            </b:navbarLinks>
+        </b:navBar>
+
+        <header class="about-heading">
+            <b:container>
+                <p:outputPanel style="display:block;">
+                    <h1 style="font-size: 60px;">Learny</h1>
+                    <p>Lorem ipsum...</p>
+                    <p>This project was made during McHacks 2017. I don't even know why I am making an about page but whatever.</p>
+                </p:outputPanel>
+            </b:container>
+
+        </header>
+
+        <h:outputStylesheet library="css" name="style.css"  />
+    </h:body>
+</html>
+

@@ -4,36 +4,70 @@
       xmlns:h="http://xmlns.jcp.org/jsf/html"
       xmlns:p="http://primefaces.org/ui"
       xmlns:f="http://xmlns.jcp.org/jsf/core"
-      xmlns:b="http://bootsfaces.net/ui">
+      xmlns:b="http://bootsfaces.net/ui"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets">
     <h:head>
         <title>Lame Title</title>
-        
+        <h:outputStylesheet name="css/bootstrap.css"/>
+
     </h:head>
     <h:body styleClass="bodyClass">
-       
-        <b:navBar brand="Learny" brandHref="#" styleClass="navBar2">
+
+        <b:navBar brand="Learny" brandHref="#" styleClass="navbar navbar-default">
             <b:navbarLinks pull="right">
-                <b:navLink value="Hello" href="#">
-                    
+                <b:navLink value="About Us" href="list.xhtml">
+
                 </b:navLink>
             </b:navbarLinks>
         </b:navBar>
-        
+
+        <header class="page-heading">
+            <b:container>
+                <p:outputPanel style="display:block;">
+                    <h1 style="font-size: 60px;">Learny</h1>
+                    <p>A simple text document interpreter which finds the important information for you!</p>
+                </p:outputPanel>
+            </b:container>
+
+        </header>
+
         <h:outputStylesheet library="css" name="style.css"  />
+
         <b:container>
-            <b:row styleClass="text-center">
-                <h1>Hello</h1>
+
+            <b:row style="margin-bottom: 10px;">
+                <h1 class="main_title">Upload a file to begin</h1>
             </b:row>
 
-            <h:form>
-                <p:fileUpload fileUploadListener="#{fileUploadView.handleFileUpload}" mode="advanced" dragDropSupport="false"
-                              update="messages"  fileLimit="1" allowTypes="/(\.|\/)(txt)$/" auto="true" />
+            <b:row>
+                <h:form>
+                    <p:fileUpload styleClass="col-md-6 col-xs-12" fileUploadListener="#{fileUploadView.handleFileUpload}" mode="advanced" dragDropSupport="true"
+                                  update="messages outputText"  fileLimit="1" allowTypes="/(\.|\/)(txt)$/" auto="false" />
 
-                <p:growl id="messages" showDetail="true" />
-            </h:form>
+                    <p:growl id="messages" showDetail="true" />
+                </h:form>
+
+                <p:panel id="basic" header="Instructions" styleClass="col-md-6 col-xs-12">
+                    <h:panelGrid columns="1" >
+                        <h:outputText
+                            value="1. Upload your .txt file." />
+                        <h:outputText value="2. ???" />
+                        <h:outputText value="3. Profit." />
+                    </h:panelGrid>
+                </p:panel>
+            </b:row>    
+
+
+            <b:row style="margin-top:20px;">
+                <ul id="outputText" lass="bullets">
+                    <ui:repeat value="#{fileUploadView.data}" var="item" id="outputText">
+                        <li class="bullets"><h:outputText value="#{item}"/></li>
+                    </ui:repeat>
+                </ul>
+            </b:row>
         </b:container>
-        
-        
+
+
     </h:body>
 </html>
 

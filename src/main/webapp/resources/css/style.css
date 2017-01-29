@@ -1,7 +1,96 @@
 .bodyClass{
-    background-color: #4577C6;
+    background-color: #fff /*#43bdc9*/;
 }
 
-.navBar2{
-    background-color: #E56916;
+.navbar-default{
+    background-color: #fc4e1b;
+    border-color: #fc4e1b;
+    color:#fff;
+    margin-bottom:0;
+    border-radius: 0;
+}
+
+
+.navbar-brand,
+.navbar-default .navbar-nav > li > a,
+a.navbar-brand,
+.navbar-default .navbar-brand{
+    color: #fff;
+    transition: background-color 0.4s;
+}
+
+.navbar-default .navbar-nav > li > a:hover,
+.navbar-default .navbar-brand:hover{
+    background-color: #fc420c;
+    color:#fff;
+}
+
+.navbar-default .navbar-nav > li > a:visited,
+.navbar-default .navbar-brand:visited{
+    background-color: #fc420c;
+    color:#fff;
+}
+
+.navbar-default .navbar-toggle:hover,
+.navbar-default .navbar-toggle:focus{
+    background-color: #fc420c;
+    color:#fff;
+}
+.navbar-default .navbar-toggle .icon-bar{
+    background-color: #fff;
+}
+
+.page-heading {position: relative;padding: 60px 15px;color: rgba(255, 255, 255, 0.7);margin-bottom: 0;font-size: 20px;background-image: url("#{resource['/images/bg.jpg']}");background-color: rgba(0,0,0,0.8);}
+.page-heading h1 { margin-top: 0; color: white; }
+.page-heading p { margin-bottom: 0; line-height: 1.4; }
+.page-heading .container { position: relative; }
+
+.fileupload-buttonbar {
+    background: transparent none;
+    border: none;
+}
+
+about-heading{
+    height:100%;
+    position: relative;
+    padding: 60px 15px;
+    color: rgba(255, 255, 255, 0.7);
+    margin-bottom: 0;
+    font-size: 20px;
+    background-image: url("#{resource['/images/bg.jpg']}");
+    background-color: rgba(0,0,0,0.8);
+}
+
+
+.fileupload-content {
+    display: none;
+}
+
+.ui-fileupload .fileinput-button {
+    background-color: rgba(142, 103, 64, 0.98);
+}
+
+.main_title{
+    border-bottom: 3px solid #fc4e1b;
+    display:inline-block;
+    padding-left: 5px;
+    padding-right:5px;
+    margin-bottom: 10px;
+    transition: padding-right 1s;
+}
+
+.main_title:hover{
+    padding-right: 15px;
+}
+.ui-fileupload-content{
+    min-height: 100px;
+}
+
+.ui-panel .ui-panel-content{
+    min-height:95px;
+}
+.bullets{
+    color:#222;
+    font-size: 27px;
+    text-decoration: underline;
 }
