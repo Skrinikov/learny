@@ -452,6 +452,82 @@ public class Interpreter {
 
 
     /**
+     * Checks if a Word object is categorized as a Time type
+     *
+     * @param word
+     * @return
+     */
+    private boolean isWordATime(Word word) {
+        if (!word.getPartOfSpeech().equals("CD")) {
+            return false;
+        }
+        Entity entity = word.getEntities().get(0);
+        if (entity.getDBPediaTypes().get(0).equalsIgnoreCase("time")) {
+            return false;
+        }
+        return true;
+    }
+
+    /**
+     * Checks if the word object is a "to",
+     * a "preposition subordinate conjunctions",
+     * or a "coordinating conjunction".
+     * @param word
+     * @return 
+     */
+    private boolean isWordTOINCC(Word word) {
+        String wordPOS = word.getPartOfSpeech();
+
+        if (wordPOS.equals("TO")) {
+            return true;
+        }
+        if (wordPOS.equals("IN")) {
+            return true;
+        }
+        if (wordPOS.equals("CC")) {
+            return true;
+        }
+        return false;
+    }
+
+    /**
+     * Checks if the inputed word object is "is", "was", or "will".
+     * @param word
+     * @return 
+     */
+    private boolean isWordIsWasWill(Word word) {
+        String wordToken = word.getToken();
+
+        if (wordToken.equalsIgnoreCase("is")) {
+            return true;
+        }
+        if (wordToken.equalsIgnoreCase("was")) {
+            return true;
+        }
+        if (wordToken.equalsIgnoreCase("will")) {
+            return true;
+        }
+        return false;
+    }
+    
+    /**
+     * Checks if the inputed word object is part of a noun phrase.
+     * @param word
+     * @return 
+     */
+    private boolean doesWordHasNP(Word word){
+       List<NounPhrase> nps=word.getNounPhrases();
+       
+       if(nps == null){
+           return false;
+       }
+       if(nps.size()<1){
+           return false;
+       }
+       return true;
+   }
+
+    /**
      * Check if the inputed sentence contains a Time type entity.
      *
      * @param se
@@ -461,6 +537,7 @@ public class Interpreter {
         List<Word> words = se.getWords();
         Word currWord = words.get(pos);
         Word nextWord = words.get(pos+1);
+        
         if ((pos + 2) == words.size()) {
             if (isWordATime(currWord)) {
                 return true;
@@ -479,6 +556,11 @@ public class Interpreter {
         if (currWord.getPartOfSpeech().equals("CD")) {
             if (isWordTOINCC(nextWord)) {
                 if (isWordIsWasWill(nextWord)) {
+                        if(doesWordHasNP(words.get(pos+2))){
+                            return false;
+                        }
+                        if(doesWordHasNP(words.get(pos+3))){
+                            return false;
                     }
                 }
                 return true;
