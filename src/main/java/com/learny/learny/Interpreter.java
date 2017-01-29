@@ -51,7 +51,7 @@ public class Interpreter {
         //String testString="The bank continued to mislead shareholders in its annual reports of January 2008 and April 2009, both of which identified Sheikh Mansour as the investor.";
         //String testString="Unlike RBS and Lloyds TSB, Barclays narrowly avoided having to request a government bailout late in 2008 after it was rescued by $7bn worth of new investment, most of which came from the gulf states of Qatar and Abu Dhabi.";
         //String testString = "Jhon Shmit died while sitting on the toilet.";
-        String testString = "War started in 1939 and ended in 1945";
+        String testString = "In 1986, George Bush created a conspiracy theory.";
         System.out.println(testString);
         try {
             AnalyzedText at = tr.analyze(testString);
@@ -60,19 +60,6 @@ public class Interpreter {
             for (Sentence se : rp.getSentences()) {
 
                 analyzeSentence(se);
-
-//                for(Word w : se.getWords()){
-//                    System.out.println("OUTER WORD LOOP: "+w.getToken()+" POS: "+w.getPartOfSpeech());
-//                    if(w.getNounPhrases() != null){
-//                        for(NounPhrase np : w.getNounPhrases()){
-//                            for(Word npw : np.getWords()){
-//                                if(npw.getPartOfSpeech().equalsIgnoreCase("NNS")){
-//                                    System.out.println("NNS: "+npw.getToken());
-//                                }
-//                            }
-//                        }
-//                    }
-//                }
             }
         } catch (Exception e) {
             throw new Exception(e.toString());
@@ -151,6 +138,7 @@ public class Interpreter {
 
         List<String> subject = new ArrayList<>();
         String tempDate = "";
+        boolean addVerb = false;
         int ctr = 0;
         int dateCtr = 0;
 
@@ -174,9 +162,11 @@ public class Interpreter {
                     if (bullet.trim().length() < 1) {
                         bullet = tempDate + " - ";
                     } else {
-                        bullet += ", " + tempDate + " - ";
+                        bullet += ", " + tempDate + " ";
                     }
 
+                } else {
+                    addVerb = true;
                 }
 
             } else if (w.getPartOfSpeech().matches("VB[DGNPZ]") && verb == null) {
@@ -190,10 +180,13 @@ public class Interpreter {
                         }
                     }
 
-                    Set<String> hs = new HashSet<>();
-                    hs.addAll(subject);
-                    subject.clear();
-                    subject.addAll(hs);
+                    List<String> temp = new ArrayList<>();
+                    for (int i = 0; i < subject.size(); i++) {
+                        if (!temp.contains(subject.get(i))) {
+                            temp.add(subject.get(i));
+                        }
+                    }
+                    subject = temp;
 
                 }
 
@@ -210,6 +203,10 @@ public class Interpreter {
             }
         }
 
+        if (verb != null && addVerb) {
+            bullet += " " + verb.getToken();
+        }
+
         System.out.println(bullet);
 
         return bullet;
@@ -224,10 +221,18 @@ public class Interpreter {
     private boolean checkWordForDate(Sentence se, int pos) {
         List<Word> words = se.getWords();
         //TODO add TO
-        if (words.get(pos).getPartOfSpeech().equals("CD")) {
-            if (words.get(pos+1).getPartOfSpeech().matches("VB[DGNPZ]") || words.get(pos+1).getPartOfSpeech().equals("IN") || words.get(pos+1).getPartOfSpeech().equals("CC")) {
-                if (words.get(pos+1).getToken().equals("is") || words.get(pos+1).getToken().equals("was") || words.get(pos+1).getToken().equals("will")) {
-                    if (words.get(pos+2).getNounPhrases() != null || words.get(pos+3).getNounPhrases() != null) {
+        if (pos + 2 == words.size() && words.get(pos).getPartOfSpeech().equals("CD") && words.get(pos).getEntities().get(0).getDBPediaTypes().get(0).equalsIgnoreCase("Time")) {
+            System.out.println("Time");
+            return true;
+        }
+        if(pos >= 1 && words.get(pos - 1).getPartOfSpeech().equals("IN") && pos + 1 < words.size() && words.get(pos+1).getToken().matches("[,.]")){
+            if(words.get(pos).getEntities().get(0).getDBPediaTypes().get(0).equalsIgnoreCase("Time"))
+                return true;
+        }
+        if (pos + 1 < words.size() && words.get(pos).getPartOfSpeech().equals("CD")) {
+            if (words.get(pos + 1).getPartOfSpeech().matches("VB[DGNPZ]") || words.get(pos + 1).getPartOfSpeech().equals("TO") || words.get(pos + 1).getPartOfSpeech().equals("IN") || words.get(pos + 1).getPartOfSpeech().equals("CC")) {
+                if (words.get(pos + 1).getToken().equals("is") || words.get(pos + 1).getToken().equals("was") || words.get(pos + 1).getToken().equals("will")) {
+                    if (words.get(pos + 2).getNounPhrases() != null || words.get(pos + 3).getNounPhrases() != null) {
                         return false;
                     }
                 }
