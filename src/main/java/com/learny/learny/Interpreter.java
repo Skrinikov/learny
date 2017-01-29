@@ -22,6 +22,8 @@ import java.util.Set;
 public class Interpreter {
 
     private TextRazor tr;
+    private int wordOffset;
+    private List<String> bullets;
 
     public Interpreter() {
         String key = "bca9ddadcc4ee6d68140c264f55ca34c2b08d7630c2a3bc1e6fdefc1";
@@ -35,7 +37,8 @@ public class Interpreter {
         List<String> classifier = new ArrayList<>();
         classifier.add("textrazor_mediatopics");
         tr.setClassifiers(classifier);
-
+        wordOffset = 0;
+        bullets = new ArrayList<>();
     }
 
     public void analyzeTest() {
@@ -115,8 +118,9 @@ public class Interpreter {
                     }
                 }
                 properNames = tempList;
-            */}
-           /*for(String s : properNames){
+                 */
+            }
+            /*for(String s : properNames){
                System.out.println("NP: "+s);
            }*/
 
@@ -133,7 +137,7 @@ public class Interpreter {
         }
         return sent;
     }
-    
+
     /**
      * NOT WORKING
      *
@@ -166,8 +170,8 @@ public class Interpreter {
 
     private boolean isDTorJJ(Word word) {
         String jjRegex = "JJ[S]?\\b";
-        
-        if (word.getPartOfSpeech().equals("DT") 
+
+        if (word.getPartOfSpeech().equals("DT")
                 || word.getPartOfSpeech().matches(jjRegex)) {
             return true;
         }
@@ -256,7 +260,7 @@ public class Interpreter {
             AnalyzedText at = tr.analyze(text);
             keywords = getMostRelevantEntities(at.getResponse());
         } catch (Exception e) {
-            System.out.println(e.getMessage());
+            e.printStackTrace();
         }
 
         return keywords;
@@ -273,10 +277,10 @@ public class Interpreter {
         List<String> subjects = new ArrayList<>();
         if (entities != null) {
             for (Entity entity : entities) {
-                if (entity.getRelevanceScore() > 0.4 
+                if (entity.getRelevanceScore() > 0.4
                         && entity.getConfidenceScore() > 2) {
                     if (!listContains(subjects, entity.getMatchedText())) {
-                        System.out.println("Entity: " + entity.getMatchedText() 
+                        System.out.println("Entity: " + entity.getMatchedText()
                                 + " - Score: " + entity.getRelevanceScore());
                         subjects.add(entity.getMatchedText());
                     }
@@ -305,6 +309,7 @@ public class Interpreter {
     }
 
     private void analyzeSentence(Sentence se) {
+        System.out.println("Sentence " + se.getWords().size());
         boolean hasNumber = false;
         boolean hasName = false;
 
@@ -317,9 +322,10 @@ public class Interpreter {
             }
         }
 
-        if (hasNumber) {
-            createNumberBullet(se);
-        }
+        bullets.add(
+                createNumberBullet(se));
+
+        wordOffset += se.getWords().size();
     }
 
     /**
@@ -341,11 +347,11 @@ public class Interpreter {
 
         for (Word w : se.getWords()) {
             if (w.getPartOfSpeech().equals("CD")) {
-                System.out.println(w.getEntities().get(0).getDBPediaTypes().get(0));
-                if (checkWordForDate(se, w.getPosition())) {
+                //System.out.println(w.getEntities().get(0).getDBPediaTypes().get(0));
+                if (checkWordForDate(se, w.getPosition() - wordOffset)) {
                     System.out.println("date" + w.getToken());
                     dateCtr++;
-                    tempDate = checkForRange(se, w.getPosition());
+                    tempDate = checkForRange(se, w.getPosition() - wordOffset);
 
                     for (int i = 0; i < subject.size(); i++) {
                         bullet += subject.get(i);
@@ -447,13 +453,13 @@ public class Interpreter {
     private String checkForRange(Sentence se, int firstVerbPos) {
         System.out.println("Hello");
         List<Word> words = se.getWords();
-        if (firstVerbPos + 2 < words.size() && words.get(firstVerbPos + 2).getEntities().size() > 0 && words.get(firstVerbPos + 2).getEntities().get(0).getDBPediaTypes().size() > 0 && words.get(firstVerbPos + 2).getEntities().get(0).getDBPediaTypes().get(0).equalsIgnoreCase("time")) {
+        if (firstVerbPos + 2 < words.size() && words.get(firstVerbPos + 2).getEntities().size() > 0 && words.get(firstVerbPos + 2).getEntities().get(0).getDBPediaTypes() != null && words.get(firstVerbPos + 2).getEntities().get(0).getDBPediaTypes().size() > 0 && words.get(firstVerbPos + 2).getEntities().get(0).getDBPediaTypes().get(0).equalsIgnoreCase("time")) {
             return words.get(firstVerbPos).getToken() + " to " + words.get(firstVerbPos + 2).getToken();
         } else {
-            if (firstVerbPos + 3 < words.size() && words.get(firstVerbPos + 3).getEntities().size() > 0 && words.get(firstVerbPos + 3).getEntities().get(0).getDBPediaTypes().size() > 0 && words.get(firstVerbPos + 3).getEntities().get(0).getDBPediaTypes().get(0).equalsIgnoreCase("time")) {
+            if (firstVerbPos + 3 < words.size() && words.get(firstVerbPos + 3).getEntities().size() > 0 && words.get(firstVerbPos + 3).getEntities().get(0).getDBPediaTypes() != null && words.get(firstVerbPos + 3).getEntities().get(0).getDBPediaTypes().size() > 0 && words.get(firstVerbPos + 3).getEntities().get(0).getDBPediaTypes().get(0).equalsIgnoreCase("time")) {
                 return words.get(firstVerbPos).getToken() + " to " + words.get(firstVerbPos + 3).getToken();
             } else {
-                if (firstVerbPos + 4 < words.size() && words.get(firstVerbPos + 4).getEntities().size() > 0 && words.get(firstVerbPos + 4).getEntities().get(0).getDBPediaTypes().size() > 0 && words.get(firstVerbPos + 4).getEntities().get(0).getDBPediaTypes().get(0).equalsIgnoreCase("time")) {
+                if (firstVerbPos + 4 < words.size() && words.get(firstVerbPos + 4).getEntities().size() > 0 && words.get(firstVerbPos + 4).getEntities().get(0).getDBPediaTypes() != null && words.get(firstVerbPos + 4).getEntities().get(0).getDBPediaTypes().size() > 0 && words.get(firstVerbPos + 4).getEntities().get(0).getDBPediaTypes().get(0).equalsIgnoreCase("time")) {
                     return words.get(firstVerbPos).getToken() + " to " + words.get(firstVerbPos + 4).getToken();
                 }
             }
