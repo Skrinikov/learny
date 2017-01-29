@@ -41,6 +41,7 @@ public class InterpreterTest {
     /**
      * Test of analyzeTest method, of class Interpreter.
      */
+    @Ignore
     @Test
     public void testAnalyzeTest() throws Exception{
         System.out.println("analyzeTest");
