@@ -1,4 +1,5 @@
 package com.learny.learny;
+
 import com.textrazor.TextRazor;
 import com.textrazor.annotations.AnalyzedText;
 import com.textrazor.annotations.Entity;
@@ -10,16 +11,20 @@ import com.textrazor.annotations.Sentence;
 import com.textrazor.annotations.Topic;
 import com.textrazor.annotations.Word;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
+
 /**
  *
  * @author nonsense
  */
 public class Interpreter {
+
     private TextRazor tr;
-    
-    public Interpreter(){
-        String key="bca9ddadcc4ee6d68140c264f55ca34c2b08d7630c2a3bc1e6fdefc1";
+
+    public Interpreter() {
+        String key = "bca9ddadcc4ee6d68140c264f55ca34c2b08d7630c2a3bc1e6fdefc1";
         tr = new TextRazor(key);
         tr.addExtractor("topics");
         tr.addExtractor("words");
@@ -27,10 +32,13 @@ public class Interpreter {
         tr.addExtractor("phrases");
         tr.addExtractor("relations");
         tr.addExtractor("dependency-tree");
-        
+        List<String> classifier = new ArrayList<>();
+        classifier.add("textrazor_mediatopics");
+        tr.setClassifiers(classifier);
+
     }
-    
-    public void analyzeTest(){
+
+    public void analyzeTest() throws Exception {
         System.out.println("ENTERING ANALYZE");
         //String testString="This is a Premier League Soccer test biology produced Saturday January 28, 2017 at McHacks2k17.";
         //String testString="The chancellor has postponed the sale of the government's final stake in Lloyds Banking Group";
@@ -43,16 +51,16 @@ public class Interpreter {
         //String testString="The bank continued to mislead shareholders in its annual reports of January 2008 and April 2009, both of which identified Sheikh Mansour as the investor.";
         //String testString="Unlike RBS and Lloyds TSB, Barclays narrowly avoided having to request a government bailout late in 2008 after it was rescued by $7bn worth of new investment, most of which came from the gulf states of Qatar and Abu Dhabi.";
         //String testString = "Jhon Shmit died while sitting on the toilet.";
-        String testString = "Php a scripting language where as Java is a compiled language."; 
+        String testString = "War started in 1939 and ended in 1945";
         System.out.println(testString);
-        try{
-            AnalyzedText at=tr.analyze(testString);
-            Response rp=at.getResponse();
+        try {
+            AnalyzedText at = tr.analyze(testString);
+            Response rp = at.getResponse();
 
-            for(Sentence se : rp.getSentences()){
-                
+            for (Sentence se : rp.getSentences()) {
+
                 analyzeSentence(se);
-                
+
 //                for(Word w : se.getWords()){
 //                    System.out.println("OUTER WORD LOOP: "+w.getToken()+" POS: "+w.getPartOfSpeech());
 //                    if(w.getNounPhrases() != null){
@@ -66,60 +74,191 @@ public class Interpreter {
 //                    }
 //                }
             }
-        }catch(Exception e){
-            System.out.println(e.getMessage());
+        } catch (Exception e) {
+            throw new Exception(e.toString());
         }
-        
     }
-    
-    private String retrieveSentence(Sentence sentence){
-        String sent="";
-        for(Word word : sentence.getWords()){
-            sent+=" "+word.getToken();
+
+    private String retrieveSentence(Sentence sentence) {
+        String sent = "";
+        for (Word word : sentence.getWords()) {
+            sent += " " + word.getToken();
         }
         return sent;
     }
-    
-    private boolean isDate(Entity entity){
+
+    private boolean isDate(Entity entity) {
         System.out.println("IN ISDATE");
-        for(String type : entity.getDBPediaTypes()){
-            System.out.println("TYPE: "+type);
-            if(type.equalsIgnoreCase("time")){
+        for (String type : entity.getDBPediaTypes()) {
+            System.out.println("TYPE: " + type);
+            if (type.equalsIgnoreCase("time")) {
                 return true;
             }
         }
         return false;
     }
-    
+
     /**
-     * NOT WORKING 
+     * NOT WORKING
+     *
      * @param dates
-     * @return 
+     * @return
      */
-    private String returnTimeFrame(List<String> dates){
-        String date="";
-        if(dates.size() == 2){
-            date=dates.get(0)+"-"+dates.get(1);
+    private String returnTimeFrame(List<String> dates) {
+        String date = "";
+        if (dates.size() == 2) {
+            date = dates.get(0) + "-" + dates.get(1);
         }
         return date;
     }
-    
-    private void retrieveMostRelevantTopic(Response rp){
-        
+
+    private void retrieveMostRelevantTopic(Response rp) {
+
     }
-    
-    
+
     /*
     private String retrieveNounPhrase(Word word){
         for(NounPhrase np:word.getNounPhrases()){
             
         }
     }*/
-
     private void analyzeSentence(Sentence se) {
-        
-        for(Word w : se.getWords()){
-            System.out.println(w.getToken()+":"+w.getPartOfSpeech());
+        boolean hasNumber = false;
+        boolean hasName = false;
+
+        for (Word w : se.getWords()) {
+            if (w.getPartOfSpeech().equals("CD")) {
+                hasNumber = true;
+            }
+            if (w.getPartOfSpeech().equals("NNP")) {
+                hasName = true;
+            }
+        }
+
+        if (hasNumber) {
+            createNumberBullet(se);
         }
     }
+
+    /**
+     * This methods assumes there were no Proper Names in the sentence
+     *
+     * @param se
+     * @return
+     */
+    private String createNumberBullet(Sentence se) {
+        String bullet = "";
+
+        List<String> subject = new ArrayList<>();
+        String tempDate = "";
+        int ctr = 0;
+        int dateCtr = 0;
+
+        Word verb = null;
+
+        for (Word w : se.getWords()) {
+            if (w.getPartOfSpeech().equals("CD")) {
+                System.out.println(w.getEntities().get(0).getDBPediaTypes().get(0));
+                if (checkWordForDate(se, w.getPosition())) {
+                    System.out.println("date" + w.getToken());
+                    dateCtr++;
+                    tempDate = checkForRange(se, w.getPosition());
+
+                    for (int i = 0; i < subject.size(); i++) {
+                        bullet += subject.get(i);
+                        if (i + 1 < subject.size()) {
+                            bullet += " ";
+                        }
+                    }
+                    subject = new ArrayList<>();
+                    if (bullet.trim().length() < 1) {
+                        bullet = tempDate + " - ";
+                    } else {
+                        bullet += ", " + tempDate + " - ";
+                    }
+
+                }
+
+            } else if (w.getPartOfSpeech().matches("VB[DGNPZ]") && verb == null) {
+                verb = w;
+            } else {
+
+                if (w.getNounPhrases().size() > 0) {
+                    for (Word w2 : w.getNounPhrases().get(0).getWords()) {
+                        if (!w2.getPartOfSpeech().equals("DT")) {
+                            subject.add(w2.getToken());
+                        }
+                    }
+
+                    Set<String> hs = new HashSet<>();
+                    hs.addAll(subject);
+                    subject.clear();
+                    subject.addAll(hs);
+
+                }
+
+            }
+
+        }
+
+        if (subject.size() > 0) {
+            for (int i = 0; i < subject.size(); i++) {
+                bullet += subject.get(i);
+                if (i + 1 < subject.size()) {
+                    bullet += " ";
+                }
+            }
+        }
+
+        System.out.println(bullet);
+
+        return bullet;
+    }
+
+    /**
+     * Please work.
+     *
+     * @param se
+     * @return
+     */
+    private boolean checkWordForDate(Sentence se, int pos) {
+        List<Word> words = se.getWords();
+        //TODO add TO
+        if (words.get(pos).getPartOfSpeech().equals("CD")) {
+            if (words.get(pos+1).getPartOfSpeech().matches("VB[DGNPZ]") || words.get(pos+1).getPartOfSpeech().equals("IN") || words.get(pos+1).getPartOfSpeech().equals("CC")) {
+                if (words.get(pos+1).getToken().equals("is") || words.get(pos+1).getToken().equals("was") || words.get(pos+1).getToken().equals("will")) {
+                    if (words.get(pos+2).getNounPhrases() != null || words.get(pos+3).getNounPhrases() != null) {
+                        return false;
+                    }
+                }
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
+     *
+     * @param se
+     * @param firstVerbPos
+     * @return
+     */
+    private String checkForRange(Sentence se, int firstVerbPos) {
+        System.out.println("Hello");
+        List<Word> words = se.getWords();
+        if (firstVerbPos + 2 < words.size() && words.get(firstVerbPos + 2).getEntities().size() > 0 && words.get(firstVerbPos + 2).getEntities().get(0).getDBPediaTypes().size() > 0 && words.get(firstVerbPos + 2).getEntities().get(0).getDBPediaTypes().get(0).equalsIgnoreCase("time")) {
+            return words.get(firstVerbPos).getToken() + " to " + words.get(firstVerbPos + 2).getToken();
+        } else {
+            if (firstVerbPos + 3 < words.size() && words.get(firstVerbPos + 3).getEntities().size() > 0 && words.get(firstVerbPos + 3).getEntities().get(0).getDBPediaTypes().size() > 0 && words.get(firstVerbPos + 3).getEntities().get(0).getDBPediaTypes().get(0).equalsIgnoreCase("time")) {
+                return words.get(firstVerbPos).getToken() + " to " + words.get(firstVerbPos + 3).getToken();
+            } else {
+                if (firstVerbPos + 4 < words.size() && words.get(firstVerbPos + 4).getEntities().size() > 0 && words.get(firstVerbPos + 4).getEntities().get(0).getDBPediaTypes().size() > 0 && words.get(firstVerbPos + 4).getEntities().get(0).getDBPediaTypes().get(0).equalsIgnoreCase("time")) {
+                    return words.get(firstVerbPos).getToken() + " to " + words.get(firstVerbPos + 4).getToken();
+                }
+            }
+        }
+        System.out.println(words.get(firstVerbPos).getToken());
+        return words.get(firstVerbPos).getToken();
+    }
+
 }
