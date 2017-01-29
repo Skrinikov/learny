@@ -40,7 +40,7 @@ a.navbar-brand,
     background-color: #fff;
 }
 
-.page-heading {position: relative;padding: 60px 15px;color: rgba(255, 255, 255, 0.5);margin-bottom: 0;font-size: 20px;background-image: url("#{resource['/images/bg.jpg']}");background-color: rgba(0,0,0,0.8);}
+.page-heading {position: relative;padding: 60px 15px;color: rgba(255, 255, 255, 0.7);margin-bottom: 0;font-size: 20px;background-image: url("#{resource['/images/bg.jpg']}");background-color: rgba(0,0,0,0.8);}
 .page-heading h1 { margin-top: 0; color: white; }
 .page-heading p { margin-bottom: 0; line-height: 1.4; }
 .page-heading .container { position: relative; }
@@ -49,6 +49,18 @@ a.navbar-brand,
     background: transparent none;
     border: none;
 }
+
+about-heading{
+    height:100%;
+    position: relative;
+    padding: 60px 15px;
+    color: rgba(255, 255, 255, 0.7);
+    margin-bottom: 0;
+    font-size: 20px;
+    background-image: url("#{resource['/images/bg.jpg']}");
+    background-color: rgba(0,0,0,0.8);
+}
+
 
 .fileupload-content {
     display: none;
@@ -76,4 +88,9 @@ a.navbar-brand,
 
 .ui-panel .ui-panel-content{
     min-height:95px;
+}
+.bullets{
+    color:#222;
+    font-size: 27px;
+    text-decoration: underline;
 }

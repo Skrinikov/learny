@@ -15,7 +15,7 @@
 
         <b:navBar brand="Learny" brandHref="#" styleClass="navbar navbar-default">
             <b:navbarLinks pull="right">
-                <b:navLink value="Hello" href="#">
+                <b:navLink value="About Us" href="list.xhtml">
 
                 </b:navLink>
             </b:navbarLinks>
@@ -50,18 +50,21 @@
                 <p:panel id="basic" header="Instructions" styleClass="col-md-6 col-xs-12">
                     <h:panelGrid columns="1" >
                         <h:outputText
-                            value="The story begins as Don Vito Corleone..." />
+                            value="1. Upload your .txt file." />
+                        <h:outputText value="2. ???" />
+                        <h:outputText value="3. Profit." />
                     </h:panelGrid>
                 </p:panel>
             </b:row>    
 
 
-            <ul id="outputText">
-                <ui:repeat value="#{fileUploadView.data}" var="item" id="outputText">
-                    <li><h:outputText value="#{item}"/></li>
-                    <li>Hello</li>
-                </ui:repeat>
-            </ul>
+            <b:row style="margin-top:20px;">
+                <ul id="outputText" lass="bullets">
+                    <ui:repeat value="#{fileUploadView.data}" var="item" id="outputText">
+                        <li class="bullets"><h:outputText value="#{item}"/></li>
+                    </ui:repeat>
+                </ul>
+            </b:row>
         </b:container>
 
 
