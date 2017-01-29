@@ -45,7 +45,7 @@ public class InterpreterTest {
     public void testAnalyzeTest() throws Exception{
         System.out.println("analyzeTest");
         Interpreter instance = new Interpreter();
-        instance.analyze("The bank announced in 2008 that Manchester City owner Sheikh Mansour had agreed to invest more than £3bn.");
+        instance.analyze("Barclays misled shareholders and the public about one of the biggest investments in the bank's history, a BBC Panorama investigation has found.");
         // TODO review the generated test code and remove the default call to fail.
         fail("The test case is a prototype.");
     }
