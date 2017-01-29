@@ -4,7 +4,7 @@
 
     <groupId>com.learny</groupId>
     <artifactId>Learny</artifactId>
-    <version>1.0-SNAPSHOT</version>
+    <version>1.0.0-FINAL</version>
     <packaging>war</packaging>
 
 
@@ -13,18 +13,28 @@
     <name>${project.artifactId}</name>
     
     <!-- A description of the program -->
-    <description>Example of JSP Model 1 Architecture</description>
+    <description>Web application taking a text and creates bullet points</description>
     <!-- Identifies the programmer or programmers who worked on the project -->
     <developers>
         <developer>
             <id>1</id>
-            <name>Thai Vu</name>
+            <name>Thai-Vu Nguyen</name>
             <email>thaivu22@gmail.com</email>
+        </developer>
+        <developer>
+            <id>2</id>
+            <name>Danieil Skrinikov</name>
+            <email>skrinikovd@gmail.com</email>
+        </developer>
+        <developer>
+            <id>3</id>
+            <name>Hau Gilles Che</name>
+            <email>haugillesche@gmail.com</email>
         </developer>
     </developers>
     <!-- The company or organization that the programmer(s) work for -->
     <organization>
-        <name>Enter school name</name>
+        <name>Dawson College</name>
     </organization>
     <!-- Global settings for the project. Settings can be accessed in the pom
     by placing the tag name in ${...} ex. ${endorsed.dir} -->
@@ -208,6 +218,14 @@
         <!-- Plugins are components that Maven uses for specific purposes beyond
         the basic tasks -->
         <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-war-plugin</artifactId>
+                <version>2.5</version>
+                <configuration>
+                    <warName>learny</warName>
+                </configuration>
+            </plugin>
             <!-- This plugin selects the version of Java to use and adds any
             arguments to the command line compile that Maven issues -->
             <plugin>
