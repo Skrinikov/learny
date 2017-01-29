@@ -1,26 +1,31 @@
 package com.learny.managedbeans;
- 
-import com.learny.learny.newpackage.semantria.SemantriaRequest;
+
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import javax.faces.application.FacesMessage;
 import javax.faces.bean.ManagedBean;
+import javax.faces.bean.ManagedProperty;
 import javax.faces.context.FacesContext;
- 
+
 import org.primefaces.event.FileUploadEvent;
-import org.primefaces.model.UploadedFile;
- 
+
 @ManagedBean
 public class FileUploadView {
- 
-    public void handleFileUpload(FileUploadEvent event) {
+
+    @ManagedProperty("#{param.data}")
+    private List<String> data = new ArrayList();
+
+    public void handleFileUpload(FileUploadEvent event) throws IOException {
         String fileContents = new String(event.getFile().getContents());
-        
+
         FacesMessage message = new FacesMessage("Succesful", fileContents + " was submitted.");
         FacesContext.getCurrentInstance().addMessage(null, message);
-        
-        SemantriaRequest request = new SemantriaRequest();
-        List<String> result = request.requestToSemantria(fileContents);
-        
-                
+
+        //REQUEST THE API
+        //data.add(Arrays.toString(event.getFile().getContents()));
+        FacesContext.getCurrentInstance().getExternalContext().redirect("study.xhtml");
+
     }
 }
