@@ -42,8 +42,8 @@ public class Interpreter {
     }
 
     public List<String> analyze(String testString) {
-        if(testString == null || testString.isEmpty()){
-            List<String> errorList=new ArrayList<>();
+        if (testString == null || testString.isEmpty()) {
+            List<String> errorList = new ArrayList<>();
             errorList.add("Error - No value inputed");
             return errorList;
         }
@@ -83,7 +83,7 @@ public class Interpreter {
         } catch (Exception e) {
             System.out.println("ERROR -" + e.getMessage() + e.getClass());
         }
-        
+
         return bullets;
 
     }
@@ -261,13 +261,15 @@ public class Interpreter {
             if (w.getPartOfSpeech().equals("CD")) {
                 hasNumber = true;
             }
-            if (w.getPartOfSpeech().equals("NNP")) {
+            if (w.getPartOfSpeech().matches("NNP[S]?\\b")) {
                 hasName = true;
             }
         }
+        if (!hasNumber && hasName) {
 
-        bullets.add(
-                createNumberBullet(se));
+        }
+
+        bullets.add(createNumberBullet(se));
 
         wordOffset += se.getWords().size();
     }
@@ -322,12 +324,12 @@ public class Interpreter {
                     for (Word w2 : w.getNounPhrases().get(0).getWords()) {
                         if (!w2.getPartOfSpeech().equals("DT")) {
                             subject.add(w2.getToken());
-                            if(w2.getRelations() != null && w2.getRelations().size() > 0){
-                                if(w2.getRelations().get(0).getPredicateWords() != null){
-                                    
-                                        subject.add(w2.getRelations().get(0).getPredicateWords().get(0).getToken());
-                                        System.out.println(w2.getRelations().get(0).getPredicateWords().get(0).getToken());
-                                    
+                            if (w2.getRelations() != null && w2.getRelations().size() > 0) {
+                                if (w2.getRelations().get(0).getPredicateWords() != null) {
+
+                                    subject.add(w2.getRelations().get(0).getPredicateWords().get(0).getToken());
+                                    System.out.println(w2.getRelations().get(0).getPredicateWords().get(0).getToken());
+
                                 }
                             }
                         }
@@ -361,9 +363,84 @@ public class Interpreter {
         }
 
         //System.out.println(bullet);
-
         return bullet;
     }
+
+    /**
+     * Checks if a Word object is categorized as a Time type
+     *
+     * @param word
+     * @return
+     */
+    private boolean isWordATime(Word word) {
+        if (!word.getPartOfSpeech().equals("CD")) {
+            return false;
+        }
+        Entity entity = word.getEntities().get(0);
+        if (entity.getDBPediaTypes().get(0).equalsIgnoreCase("time")) {
+            return false;
+        }
+        return true;
+    }
+
+    /**
+     * Checks if the word object is a "to",
+     * a "preposition subordinate conjunctions",
+     * or a "coordinating conjunction".
+     * @param word
+     * @return 
+     */
+    private boolean isWordTOINCC(Word word) {
+        String wordPOS = word.getPartOfSpeech();
+
+        if (wordPOS.equals("TO")) {
+            return true;
+        }
+        if (wordPOS.equals("IN")) {
+            return true;
+        }
+        if (wordPOS.equals("CC")) {
+            return true;
+        }
+        return false;
+    }
+
+    /**
+     * Checks if the inputed word object is "is", "was", or "will".
+     * @param word
+     * @return 
+     */
+    private boolean isWordIsWasWill(Word word) {
+        String wordToken = word.getToken();
+
+        if (wordToken.equalsIgnoreCase("is")) {
+            return true;
+        }
+        if (wordToken.equalsIgnoreCase("was")) {
+            return true;
+        }
+        if (wordToken.equalsIgnoreCase("will")) {
+            return true;
+        }
+        return false;
+    }
+    
+    /**
+     * Checks if the inputed word object is part of a noun phrase.
+     * @param word
+     * @return 
+     */
+    private boolean doesWordHasNP(Word word){
+       List<NounPhrase> nps=word.getNounPhrases();
+       
+       if(nps == null){
+           return false;
+       }
+       if(nps.size()<1){
+           return false;
+       }
+       return true;
+   }
 
     /**
      * Please work.
@@ -373,21 +450,32 @@ public class Interpreter {
      */
     private boolean checkWordForDate(Sentence se, int pos) {
         List<Word> words = se.getWords();
-        //TODO add TO
-        if (pos + 2 == words.size() && words.get(pos).getPartOfSpeech().equals("CD") && words.get(pos).getEntities().get(0).getDBPediaTypes().get(0).equalsIgnoreCase("Time")) {
-            //System.out.println("Time");
-            return true;
-        }
-        if (pos >= 1 && words.get(pos - 1).getPartOfSpeech().equals("IN") && pos + 1 < words.size() && words.get(pos + 1).getToken().matches("[,.]")) {
-            if (words.get(pos).getEntities().get(0).getDBPediaTypes().get(0).equalsIgnoreCase("Time")) {
+        Word currWord = words.get(pos);
+        Word nextWord = words.get(pos+1);
+        
+        if ((pos + 2) == words.size()) {
+            if (isWordATime(currWord)) {
                 return true;
             }
         }
-        if (pos + 1 < words.size() && words.get(pos).getPartOfSpeech().equals("CD")) {
-            if (words.get(pos + 1).getPartOfSpeech().matches("VB[DGNPZ]") || words.get(pos + 1).getPartOfSpeech().equals("TO") || words.get(pos + 1).getPartOfSpeech().equals("IN") || words.get(pos + 1).getPartOfSpeech().equals("CC")) {
-                if (words.get(pos + 1).getToken().equals("is") || words.get(pos + 1).getToken().equals("was") || words.get(pos + 1).getToken().equals("will")) {
-                    if (words.get(pos + 2).getNounPhrases() != null || words.get(pos + 3).getNounPhrases() != null) {
-                        return false;
+        if ((pos >= 1) && words.get(pos - 1).getPartOfSpeech().equals("IN")
+                && (pos + 1 < words.size())
+                && nextWord.getToken().matches("[,.]")) {
+            if (isWordATime(currWord)) {
+                return true;
+            }
+        }
+        if (!((pos + 1) < words.size())) {
+            return false;
+        }
+        if (currWord.getPartOfSpeech().equals("CD")) {
+            if (isWordTOINCC(nextWord)) {
+                if (isWordIsWasWill(nextWord)) {
+                        if(doesWordHasNP(words.get(pos+2))){
+                            return false;
+                        }
+                        if(doesWordHasNP(words.get(pos+3))){
+                            return false;
                     }
                 }
                 return true;
