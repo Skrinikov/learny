@@ -11,6 +11,7 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import static org.junit.Assert.*;
+import org.junit.Ignore;
 
 /**
  *
@@ -40,11 +41,12 @@ public class InterpreterTest {
     /**
      * Test of analyzeTest method, of class Interpreter.
      */
+    @Ignore
     @Test
     public void testAnalyzeTest() throws Exception{
         System.out.println("analyzeTest");
         Interpreter instance = new Interpreter();
-        instance.analyze("");
+        instance.analyze("Hello JAcob, how are you.");
         // TODO review the generated test code and remove the default call to fail.
         fail("The test case is a prototype.");
     }

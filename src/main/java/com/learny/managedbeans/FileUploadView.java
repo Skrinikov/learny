@@ -35,6 +35,5 @@ public class FileUploadView {
     public void setData(List<String> data) {
         this.data = data;
     }
-    
-    
+  
 }
