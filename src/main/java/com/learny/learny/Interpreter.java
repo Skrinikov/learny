@@ -97,20 +97,6 @@ public class Interpreter {
     }
 
     /**
-     * NOT WORKING
-     *
-     * @param dates
-     * @return
-     */
-    private String returnTimeFrame(List<String> dates) {
-        String date = "";
-        if (dates.size() == 2) {
-            date = dates.get(0) + "-" + dates.get(1);
-        }
-        return date;
-    }
-
-    /**
      * WORKS Retrieves the category name & removes unnecessary elements.
      *
      * @param category
@@ -185,14 +171,14 @@ public class Interpreter {
         } else {
             isAllNNP = false;
         }
-        System.out.println("END OF METHOD: " + nnpIndexes.size());
+        //System.out.println("END OF METHOD: " + nnpIndexes.size());
 
         if (isAllNNP) {
             for (String s : nnpIndexes) {
                 properNoun += words.get(Integer.parseInt(s)).getToken() + " ";
             }
         } else {
-            System.out.println("IT WASNT ALL NNP");
+            //System.out.println("IT WASNT ALL NNP");
         }
         properNoun = properNoun.substring(0, properNoun.length() - 1);
         return properNoun;
@@ -267,7 +253,7 @@ public class Interpreter {
     }
 
     private void analyzeSentence(Sentence se) {
-        System.out.println("Sentence " + se.getWords().size());
+        //System.out.println("Sentence " + se.getWords().size());
         boolean hasNumber = false;
         boolean hasName = false;
 
@@ -307,7 +293,7 @@ public class Interpreter {
             if (w.getPartOfSpeech().equals("CD")) {
                 //System.out.println(w.getEntities().get(0).getDBPediaTypes().get(0));
                 if (checkWordForDate(se, w.getPosition() - wordOffset)) {
-                    System.out.println("date" + w.getToken());
+                    //System.out.println("date" + w.getToken());
                     dateCtr++;
                     tempDate = checkForRange(se, w.getPosition() - wordOffset);
 
@@ -336,6 +322,14 @@ public class Interpreter {
                     for (Word w2 : w.getNounPhrases().get(0).getWords()) {
                         if (!w2.getPartOfSpeech().equals("DT")) {
                             subject.add(w2.getToken());
+                            if(w2.getRelations() != null && w2.getRelations().size() > 0){
+                                if(w2.getRelations().get(0).getPredicateWords() != null){
+                                    
+                                        subject.add(w2.getRelations().get(0).getPredicateWords().get(0).getToken());
+                                        System.out.println(w2.getRelations().get(0).getPredicateWords().get(0).getToken());
+                                    
+                                }
+                            }
                         }
                     }
 
@@ -366,7 +360,7 @@ public class Interpreter {
             bullet += " " + verb.getToken();
         }
 
-        System.out.println(bullet);
+        //System.out.println(bullet);
 
         return bullet;
     }
@@ -381,7 +375,7 @@ public class Interpreter {
         List<Word> words = se.getWords();
         //TODO add TO
         if (pos + 2 == words.size() && words.get(pos).getPartOfSpeech().equals("CD") && words.get(pos).getEntities().get(0).getDBPediaTypes().get(0).equalsIgnoreCase("Time")) {
-            System.out.println("Time");
+            //System.out.println("Time");
             return true;
         }
         if (pos >= 1 && words.get(pos - 1).getPartOfSpeech().equals("IN") && pos + 1 < words.size() && words.get(pos + 1).getToken().matches("[,.]")) {
@@ -409,7 +403,7 @@ public class Interpreter {
      * @return
      */
     private String checkForRange(Sentence se, int firstVerbPos) {
-        System.out.println("Hello");
+        //System.out.println("Hello");
         List<Word> words = se.getWords();
         if (firstVerbPos + 2 < words.size() && words.get(firstVerbPos + 2).getEntities().size() > 0 && words.get(firstVerbPos + 2).getEntities().get(0).getDBPediaTypes() != null && words.get(firstVerbPos + 2).getEntities().get(0).getDBPediaTypes().size() > 0 && words.get(firstVerbPos + 2).getEntities().get(0).getDBPediaTypes().get(0).equalsIgnoreCase("time")) {
             return words.get(firstVerbPos).getToken() + " to " + words.get(firstVerbPos + 2).getToken();
@@ -422,7 +416,7 @@ public class Interpreter {
                 }
             }
         }
-        System.out.println(words.get(firstVerbPos).getToken());
+        //System.out.println(words.get(firstVerbPos).getToken());
         return words.get(firstVerbPos).getToken();
     }
 
