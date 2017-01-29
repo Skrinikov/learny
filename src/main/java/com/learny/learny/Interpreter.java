@@ -1,4 +1,5 @@
 package com.learny.learny;
+
 import com.textrazor.TextRazor;
 import com.textrazor.annotations.AnalyzedText;
 import com.textrazor.annotations.Entity;
@@ -11,15 +12,17 @@ import com.textrazor.annotations.Topic;
 import com.textrazor.annotations.Word;
 import java.util.ArrayList;
 import java.util.List;
+
 /**
  *
  * @author nonsense
  */
 public class Interpreter {
+
     private TextRazor tr;
-    
-    public Interpreter(){
-        String key="bca9ddadcc4ee6d68140c264f55ca34c2b08d7630c2a3bc1e6fdefc1";
+
+    public Interpreter() {
+        String key = "bca9ddadcc4ee6d68140c264f55ca34c2b08d7630c2a3bc1e6fdefc1";
         tr = new TextRazor(key);
         tr.addExtractor("topics");
         tr.addExtractor("words");
@@ -27,12 +30,15 @@ public class Interpreter {
         tr.addExtractor("phrases");
         tr.addExtractor("relations");
         tr.addExtractor("dependency-tree");
-        
+        List<String> classifier = new ArrayList<>();
+        classifier.add("textrazor_mediatopics");
+        tr.setClassifiers(classifier);
+
     }
-    
-    public void analyzeTest(){
+
+    public void analyzeTest() {
         System.out.println("ENTERING ANALYZE");
-        //String testString="This is a Premier League Soccer test biology produced Saturday January 28, 2017 at McHacks2k17.";
+        //String testString="This is a  test produced Saturday January 28, 2017 at McHacks2k17.";
         //String testString="The chancellor has postponed the sale of the government's final stake in Lloyds Banking Group";
         //String testString="The economic growth of the population of India.";
         /*String testString="You will work in assigned groups from 2008 to 2009. Each group will demonstrate its work, as specified by your instructor. All group members must be present at the demonstration. All members of a group are expected to contribute more or less equally to the project and to be familiar with all of the work of the project.\n" +
@@ -41,23 +47,27 @@ public class Interpreter {
         //String testString="Martin Luther Zoidberg managed to get apples";
         //String testString="Between 2008 and 2009, you will work in assigned group.";
         //String testString="The bank continued to mislead shareholders in its annual reports of January 2008 and April 2009, both of which identified Sheikh Mansour as the investor.";
-        String testString="Unlike RBS and Lloyds TSB, Barclays narrowly avoided having to request a government bailout late in 2008 after it was rescued by $7bn worth of new investment, most of which came from the gulf states of Qatar and Abu Dhabi.";
+        //String testString = "Unlike from RBS and Lloyds TSB, Barclays narrowly avoided having to request a government bailout late in 2008 after it was rescued by $7bn worth of new investment, most of which came from the gulf states of Qatar and Abu Dhabi.";
+        String testString="Martin Luther King Jr was a great black man.";
         System.out.println(testString);
-        try{
-            AnalyzedText at=tr.analyze(testString);
-            Response rp=at.getResponse();
-            for(ScoredCategory c : rp.getCategories()){
-                System.out.println("CAT: "+c.getLabel());
-            }
-            List<String> dates=new ArrayList<>();
-            for(Sentence se : rp.getSentences()){
-                for(Word w : se.getWords()){
-                    System.out.println("OUTER WORD LOOP: "+w.getToken()+" POS: "+w.getPartOfSpeech());
-                    if(w.getNounPhrases() != null){
-                        for(NounPhrase np : w.getNounPhrases()){
-                            for(Word npw : np.getWords()){
-                                if(npw.getPartOfSpeech().equalsIgnoreCase("NNS")){
-                                    System.out.println("NNS: "+npw.getToken());
+        try {
+            AnalyzedText at = tr.analyze(testString);
+            Response rp = at.getResponse();
+           
+            //System.out.println("CAT: "+c.getLabel()+" SCORE: "+c.getScore());
+            ScoredCategory c = rp.getCategories().get(0);
+            System.out.println(getCategory(c.getLabel()));
+            
+            List<String> dates = new ArrayList<>();
+            for (Sentence se : rp.getSentences()) {
+                System.out.println(retrieveSentence(se));
+                for (Word w : se.getWords()) {
+                    System.out.println("OUTER WORD LOOP: " + w.getToken() + " POS: " + w.getPartOfSpeech());
+                    if (w.getNounPhrases() != null) {
+                        for (NounPhrase np : w.getNounPhrases()) {
+                            for (Word npw : np.getWords()) {
+                                if (npw.getPartOfSpeech().equalsIgnoreCase("NNS")) {
+                                    System.out.println("NNS: " + npw.getToken());
                                 }
                             }
                         }
@@ -89,47 +99,65 @@ public class Interpreter {
                 }
             }
              */
-        }catch(Exception e){
+        } catch (Exception e) {
             System.out.println(e.getMessage());
         }
-        
+
     }
-    
-    private String retrieveSentence(Sentence sentence){
-        String sent="";
-        for(Word word : sentence.getWords()){
-            sent+=" "+word.getToken();
+
+    private String retrieveSentence(Sentence sentence) {
+        String sent = "";
+        for (Word word : sentence.getWords()) {
+            sent += " " + word.getToken();
         }
         return sent;
     }
-    
-    private boolean isDate(Entity entity){
+
+    private boolean isDate(Entity entity) {
         System.out.println("IN ISDATE");
-        for(String type : entity.getDBPediaTypes()){
-            System.out.println("TYPE: "+type);
-            if(type.equalsIgnoreCase("time")){
+        for (String type : entity.getDBPediaTypes()) {
+            System.out.println("TYPE: " + type);
+            if (type.equalsIgnoreCase("time")) {
                 return true;
             }
         }
         return false;
     }
-    
+
     /**
-     * NOT WORKING 
+     * NOT WORKING
+     *
      * @param dates
-     * @return 
+     * @return
      */
-    private String returnTimeFrame(List<String> dates){
-        String date="";
-        if(dates.size() == 2){
-            date=dates.get(0)+"-"+dates.get(1);
+    private String returnTimeFrame(List<String> dates) {
+        String date = "";
+        if (dates.size() == 2) {
+            date = dates.get(0) + "-" + dates.get(1);
         }
         return date;
     }
-    
-    private void retrieveMostRelevantTopic(Response rp){
-        
+
+    private void retrieveMostRelevantTopic(Response rp) {
+
     }
+
+    /**
+     * WORKS
+     * Retrieves the category name & removes unnecessary elements.
+     * @param category 
+     * @return 
+     */
+    private String getCategory(String category) {
+        String cat = category;
+        int trunkIndex = category.length()-1;
+        if (category.contains(">")) {
+            trunkIndex = (category.lastIndexOf('>'))+1;
+            cat = category.substring(trunkIndex);
+        }
+        return cat;
+    }
+    /*
     private String retrieveProperNoun(Word word) {
         String properNoun = "";
         if (word.getPartOfSpeech().equalsIgnoreCase("NNP")) {
@@ -145,9 +173,9 @@ public class Interpreter {
                 }
             }
         }
-    }
-    
-    /*
+    }*/
+
+ /*
     private String retrieveNounPhrase(Word word){
         for(NounPhrase np:word.getNounPhrases()){
             
