@@ -42,8 +42,8 @@ public class Interpreter {
     }
 
     public List<String> analyze(String testString) {
-        if(testString == null || testString.isEmpty()){
-            List<String> errorList=new ArrayList<>();
+        if (testString == null || testString.isEmpty()) {
+            List<String> errorList = new ArrayList<>();
             errorList.add("Error - No value inputed");
             return errorList;
         }
@@ -83,7 +83,7 @@ public class Interpreter {
         } catch (Exception e) {
             System.out.println("ERROR -" + e.getMessage() + e.getClass());
         }
-        
+
         return bullets;
 
     }
@@ -266,8 +266,8 @@ public class Interpreter {
             }
         }
 
-        bullets.add(
-                createNumberBullet(se));
+        String s = temp(se);
+        bullets.add(s);
 
         wordOffset += se.getWords().size();
     }
@@ -322,13 +322,17 @@ public class Interpreter {
                     for (Word w2 : w.getNounPhrases().get(0).getWords()) {
                         if (!w2.getPartOfSpeech().equals("DT")) {
                             subject.add(w2.getToken());
-                            if(w2.getRelations() != null && w2.getRelations().size() > 0){
-                                if(w2.getRelations().get(0).getPredicateWords() != null){
-                                    
-                                        subject.add(w2.getRelations().get(0).getPredicateWords().get(0).getToken());
-                                        System.out.println(w2.getRelations().get(0).getPredicateWords().get(0).getToken());
-                                    
-                                }
+
+                        }
+                        if (w2.getRelations() == null) {
+                            System.out.println("NULL");
+                        }
+                        if (w2.getRelations() != null && w2.getRelations().size() > 0) {
+                            if (w2.getRelations().get(0).getPredicateWords() != null) {
+                                System.out.println("HEllo");
+                                subject.add(w2.getRelations().get(0).getPredicateWords().get(0).getToken());
+                                System.out.println(w2.getRelations().get(0).getPredicateWords().get(0).getToken());
+
                             }
                         }
                     }
@@ -361,8 +365,84 @@ public class Interpreter {
         }
 
         //System.out.println(bullet);
-
         return bullet;
+    }
+
+    private String temp(Sentence se) {
+        String out = "";
+        String verb = null;
+
+        List<String> subject = new ArrayList<>();
+        List<String> time = new ArrayList<>();
+        List<String> what = new ArrayList<>();
+
+        int pos = 0;
+        List<Word> words = se.getWords();
+
+        while (pos < words.size()) {
+            if (words.get(pos).getNounPhrases() != null && words.get(pos).getNounPhrases().size() > 0) {
+                NounPhrase np = words.get(pos).getNounPhrases().get(0);
+                String nouns = retrieveNouns(np);
+                pos = np.getWords().get(np.getWords().size() - 1).getPosition() - wordOffset;
+
+                if (nouns.length() < 1) {
+                    checkIfNpRelevant(np);
+                }
+
+                if (nouns.length() > 2) {
+                    if (verb == null) {
+                        subject.add(nouns);
+                    } else {
+                        what.add(nouns);
+                    }
+                }
+            } else if (words.get(pos).getPartOfSpeech().equals("CD")) {
+                if (isMoney(words.get(pos))) {
+                    what.add(words.get(pos).getToken());
+                }
+                if (isWordATime(words.get(pos))) {
+                    time.add(words.get(pos).getToken());
+                }
+            } else if (words.get(pos).getPartOfSpeech().matches("VB[GD]")) {
+                verb = words.get(pos).getToken();
+            }
+            pos++;
+        }
+
+        out = "In" +time.get(0) +  createSubject(subject) + " " + verb + " " + createSubject(what);
+        return out;
+    }
+
+    private String createSubject(List<String> subj) {
+        String subject = "";
+
+        if (subj.size() == 1) {
+            return subj.get(0);
+        }
+
+        for (int i = 0; i < subj.size(); i++) {
+            if (i == subj.size() - 1) {
+                subject += "and " + subj.get(i);
+            } else {
+                subject += subj.get(i) + ", ";
+            }
+        }
+
+        return subject;
+    }
+
+    private boolean isMoney(Word w) {
+        List<Entity> es = w.getEntities();
+        if (es != null && es.size() > 0) {
+            Entity e = es.get(0);
+            List<String> d = e.getDBPediaTypes();
+            if (d != null && d.size() > 0) {
+                if (d.get(0).equalsIgnoreCase("Money")) {
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 
     /**
@@ -396,28 +476,29 @@ public class Interpreter {
         return false;
     }
 
-    /**
-     *
-     * @param se
-     * @param firstVerbPos
-     * @return
-     */
     private String checkForRange(Sentence se, int firstVerbPos) {
-        //System.out.println("Hello");
         List<Word> words = se.getWords();
-        if (firstVerbPos + 2 < words.size() && words.get(firstVerbPos + 2).getEntities().size() > 0 && words.get(firstVerbPos + 2).getEntities().get(0).getDBPediaTypes() != null && words.get(firstVerbPos + 2).getEntities().get(0).getDBPediaTypes().size() > 0 && words.get(firstVerbPos + 2).getEntities().get(0).getDBPediaTypes().get(0).equalsIgnoreCase("time")) {
-            return words.get(firstVerbPos).getToken() + " to " + words.get(firstVerbPos + 2).getToken();
-        } else {
-            if (firstVerbPos + 3 < words.size() && words.get(firstVerbPos + 3).getEntities().size() > 0 && words.get(firstVerbPos + 3).getEntities().get(0).getDBPediaTypes() != null && words.get(firstVerbPos + 3).getEntities().get(0).getDBPediaTypes().size() > 0 && words.get(firstVerbPos + 3).getEntities().get(0).getDBPediaTypes().get(0).equalsIgnoreCase("time")) {
-                return words.get(firstVerbPos).getToken() + " to " + words.get(firstVerbPos + 3).getToken();
-            } else {
-                if (firstVerbPos + 4 < words.size() && words.get(firstVerbPos + 4).getEntities().size() > 0 && words.get(firstVerbPos + 4).getEntities().get(0).getDBPediaTypes() != null && words.get(firstVerbPos + 4).getEntities().get(0).getDBPediaTypes().size() > 0 && words.get(firstVerbPos + 4).getEntities().get(0).getDBPediaTypes().get(0).equalsIgnoreCase("time")) {
-                    return words.get(firstVerbPos).getToken() + " to " + words.get(firstVerbPos + 4).getToken();
-                }
+
+        for (int i = 2; i < 4; i++) {
+            if (firstVerbPos + i < words.size() && words.get(firstVerbPos + i).getEntities().size() > 0 && words.get(firstVerbPos + i).getEntities().get(0).getDBPediaTypes() != null && words.get(firstVerbPos + i).getEntities().get(0).getDBPediaTypes().size() > 0 && words.get(firstVerbPos + i).getEntities().get(0).getDBPediaTypes().get(0).equalsIgnoreCase("time")) {
+                return words.get(firstVerbPos).getToken() + " to " + words.get(firstVerbPos + i).getToken();
             }
         }
-        //System.out.println(words.get(firstVerbPos).getToken());
+
         return words.get(firstVerbPos).getToken();
+    }
+
+    private boolean isWordATime(Word get) {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    private String checkIfNpRelevant(NounPhrase np) {
+        for (Word w : np.getWords()) {
+            if (isMoney(w)) {
+                return w.getToken();
+            }
+        }
+        return "";
     }
 
 }

@@ -41,12 +41,11 @@ public class InterpreterTest {
     /**
      * Test of analyzeTest method, of class Interpreter.
      */
-    @Ignore
     @Test
     public void testAnalyzeTest() throws Exception{
         System.out.println("analyzeTest");
         Interpreter instance = new Interpreter();
-        instance.analyze("Hello JAcob, how are you.");
+        instance.analyze("The bank announced in 2008 that Manchester City owner Sheikh Mansour had agreed to invest more than £3bn.");
         // TODO review the generated test code and remove the default call to fail.
         fail("The test case is a prototype.");
     }
