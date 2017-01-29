@@ -45,7 +45,7 @@ public class InterpreterTest {
     public void testAnalyzeTest() throws Exception{
         System.out.println("analyzeTest");
         Interpreter instance = new Interpreter();
-        instance.analyze("Barclays misled shareholders and the public about one of the biggest investments in the bank's history, a BBC Panorama investigation has found.");
+        instance.analyze("Unlike RBS and Lloyds TSB, Barclays narrowly avoided having to request a government bailout late in 2008 after it was rescued by £7bn worth of new investment, most of which came from the gulf states of Qatar and Abu Dhabi.");
         // TODO review the generated test code and remove the default call to fail.
         fail("The test case is a prototype.");
     }

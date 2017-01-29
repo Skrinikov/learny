@@ -38,7 +38,7 @@ public class Interpreter {
         List<String> classifier = new ArrayList<>();
         classifier.add("textrazor_mediatopics");
         tr.setClassifiers(classifier);
-        wordOffset = 0;
+        wordOffset = -1;
         bullets = new ArrayList<>();
     }
 
@@ -51,8 +51,9 @@ public class Interpreter {
         try {
             AnalyzedText at = tr.analyze(testString);
             Response rp = at.getResponse();
-
-            ScoredCategory c = rp.getCategories().get(0);
+            
+            
+            //ScoredCategory c = rp.getCategories().get(0);
 
             List<String> dates = new ArrayList<>();
             String temp;
@@ -294,7 +295,7 @@ public class Interpreter {
                         what.add(nouns);
                     }
                 }
-            } else if (words.get(pos).getPartOfSpeech().matches("VB[GD]")) {
+            } else if (words.get(pos).getPartOfSpeech().matches("VB[GD]") ) {
                 //Verb
                 verb = words.get(pos).getToken();
 
@@ -336,6 +337,7 @@ public class Interpreter {
             if (i == subj.size() - 1) {
                 subject += "and " + subj.get(i);
             } else {
+
                 subject += subj.get(i) + ", ";
             }
         }
@@ -434,8 +436,20 @@ public class Interpreter {
         if (nps.size() < 1) {
             return false;
         }
+        if(word.getEntities() == null || word.getEntities().size() < 1)
+            return false;
+        Entity entity = word.getEntities().get(0);
+        if (entity.getDBPediaTypes().get(0).equalsIgnoreCase("time")) {
+            return false;
+        }
         return true;
     }
+
+
+
+   
+   
+
 
     /**
      * Check if the inputed sentence contains a Time type entity.
@@ -446,8 +460,7 @@ public class Interpreter {
     private boolean checkWordForDate(Sentence se, int pos) {
         List<Word> words = se.getWords();
         Word currWord = words.get(pos);
-        Word nextWord = words.get(pos + 1);
-
+        Word nextWord = words.get(pos+1);
         if ((pos + 2) == words.size()) {
             if (isWordATime(currWord)) {
                 return true;
@@ -466,16 +479,11 @@ public class Interpreter {
         if (currWord.getPartOfSpeech().equals("CD")) {
             if (isWordTOINCC(nextWord)) {
                 if (isWordIsWasWill(nextWord)) {
-                    if (doesWordHasNP(words.get(pos + 2))) {
-                        return false;
-                    }
-                    if (doesWordHasNP(words.get(pos + 3))) {
-                        return false;
                     }
                 }
                 return true;
             }
-        }
+        
         return false;
     }
 
