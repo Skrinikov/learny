@@ -41,54 +41,31 @@ public class Interpreter {
         //String testString="Martin Luther Zoidberg managed to get apples";
         //String testString="Between 2008 and 2009, you will work in assigned group.";
         //String testString="The bank continued to mislead shareholders in its annual reports of January 2008 and April 2009, both of which identified Sheikh Mansour as the investor.";
-        String testString="Unlike RBS and Lloyds TSB, Barclays narrowly avoided having to request a government bailout late in 2008 after it was rescued by $7bn worth of new investment, most of which came from the gulf states of Qatar and Abu Dhabi.";
+        //String testString="Unlike RBS and Lloyds TSB, Barclays narrowly avoided having to request a government bailout late in 2008 after it was rescued by $7bn worth of new investment, most of which came from the gulf states of Qatar and Abu Dhabi.";
+        //String testString = "Jhon Shmit died while sitting on the toilet.";
+        String testString = "Php a scripting language where as Java is a compiled language."; 
         System.out.println(testString);
         try{
             AnalyzedText at=tr.analyze(testString);
             Response rp=at.getResponse();
-            for(ScoredCategory c : rp.getCategories()){
-                System.out.println("CAT: "+c.getLabel());
-            }
-            List<String> dates=new ArrayList<>();
+
             for(Sentence se : rp.getSentences()){
-                for(Word w : se.getWords()){
-                    System.out.println("OUTER WORD LOOP: "+w.getToken()+" POS: "+w.getPartOfSpeech());
-                    if(w.getNounPhrases() != null){
-                        for(NounPhrase np : w.getNounPhrases()){
-                            for(Word npw : np.getWords()){
-                                if(npw.getPartOfSpeech().equalsIgnoreCase("NNS")){
-                                    System.out.println("NNS: "+npw.getToken());
-                                }
-                            }
-                        }
-                    }
-                }
+                
+                analyzeSentence(se);
+                
+//                for(Word w : se.getWords()){
+//                    System.out.println("OUTER WORD LOOP: "+w.getToken()+" POS: "+w.getPartOfSpeech());
+//                    if(w.getNounPhrases() != null){
+//                        for(NounPhrase np : w.getNounPhrases()){
+//                            for(Word npw : np.getWords()){
+//                                if(npw.getPartOfSpeech().equalsIgnoreCase("NNS")){
+//                                    System.out.println("NNS: "+npw.getToken());
+//                                }
+//                            }
+//                        }
+//                    }
+//                }
             }
-            /*
-            for(Sentence se : rp.getSentences()){
-                System.out.println("SENT POS: "+se.getPosition());
-                System.out.println(retrieveSentence(se));
-                for(Word w :se.getWords()){
-                    System.out.println("NOW IN WORDS LOOP");
-                    for(Entity entity : w.getEntities()){
-                        System.out.println("NOW IN ENTITIES LOOP");
-                        for(Word we : entity.getMatchingWords()){
-                            System.out.println("MATCHING WORD: "+we.getToken()+" ENTITY: "+entity.getEntityEnglishId()+" MATCHED TXT: "+entity.getMatchedText());
-                        }
-                        if(isDate(entity)){
-                            System.out.println("IN DATE CHECK");
-                            for(Relation r : w.getRelations()){
-                                for(Word pw : r.getPredicateWords()){
-                                    System.out.println("RELATIONS WORDS: "+pw.getToken());
-                                }
-                            }
-                        
-                            dates.add(w.getToken());
-                        }
-                    }
-                }
-            }
-             */
         }catch(Exception e){
             System.out.println(e.getMessage());
         }
@@ -130,22 +107,7 @@ public class Interpreter {
     private void retrieveMostRelevantTopic(Response rp){
         
     }
-    private String retrieveProperNoun(Word word) {
-        String properNoun = "";
-        if (word.getPartOfSpeech().equalsIgnoreCase("NNP")) {
-            if (word.getNounPhrases() == null) {
-                properNoun = word.getToken();
-            } else {
-                for (NounPhrase np : word.getNounPhrases()) {
-                    for (Word npw : np.getWords()) {
-                        if (word.getPartOfSpeech().equalsIgnoreCase("NNP")) {
-                            properNoun+=" "+word.getToken();
-                        }
-                    }
-                }
-            }
-        }
-    }
+    
     
     /*
     private String retrieveNounPhrase(Word word){
@@ -153,4 +115,11 @@ public class Interpreter {
             
         }
     }*/
+
+    private void analyzeSentence(Sentence se) {
+        
+        for(Word w : se.getWords()){
+            System.out.println(w.getToken()+":"+w.getPartOfSpeech());
+        }
+    }
 }
