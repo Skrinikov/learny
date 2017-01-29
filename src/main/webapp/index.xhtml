@@ -4,7 +4,8 @@
       xmlns:h="http://xmlns.jcp.org/jsf/html"
       xmlns:p="http://primefaces.org/ui"
       xmlns:f="http://xmlns.jcp.org/jsf/core"
-      xmlns:b="http://bootsfaces.net/ui">
+      xmlns:b="http://bootsfaces.net/ui"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets">
     <h:head>
         <title>Lame Title</title>
         <h:outputStylesheet name="css/bootstrap.css"/>
@@ -31,19 +32,36 @@
         </header>
 
         <h:outputStylesheet library="css" name="style.css"  />
-        
+
         <b:container>
-            
-            <b:row styleClass="text-center">
-                <h1>Hello</h1>
+
+            <b:row style="margin-bottom: 10px;">
+                <h1 class="main_title">Upload a file to begin</h1>
             </b:row>
 
-            <h:form>
-                <p:fileUpload fileUploadListener="#{fileUploadView.handleFileUpload}" mode="advanced" dragDropSupport="false"
-                              update="messages"  fileLimit="1" allowTypes="/(\.|\/)(txt)$/" auto="true" />
+            <b:row>
+                <h:form>
+                    <p:fileUpload styleClass="col-md-6 col-xs-12" fileUploadListener="#{fileUploadView.handleFileUpload}" mode="advanced" dragDropSupport="true"
+                                  update="messages outputText"  fileLimit="1" allowTypes="/(\.|\/)(txt)$/" auto="false" />
 
-                <p:growl id="messages" showDetail="true" />
-            </h:form>
+                    <p:growl id="messages" showDetail="true" />
+                </h:form>
+
+                <p:panel id="basic" header="Instructions" styleClass="col-md-6 col-xs-12">
+                    <h:panelGrid columns="1" >
+                        <h:outputText
+                            value="The story begins as Don Vito Corleone..." />
+                    </h:panelGrid>
+                </p:panel>
+            </b:row>    
+
+
+            <ul id="outputText">
+                <ui:repeat value="#{fileUploadView.data}" var="item" id="outputText">
+                    <li><h:outputText value="#{item}"/></li>
+                    <li>Hello</li>
+                </ui:repeat>
+            </ul>
         </b:container>
 
 
