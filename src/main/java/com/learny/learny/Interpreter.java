@@ -42,7 +42,11 @@ public class Interpreter {
     }
 
     public List<String> analyze(String testString) {
-        
+        if(testString == null || testString.isEmpty()){
+            List<String> errorList=new ArrayList<>();
+            errorList.add("Error - No value inputed");
+            return errorList;
+        }
         try {
             AnalyzedText at = tr.analyze(testString);
             Response rp = at.getResponse();
