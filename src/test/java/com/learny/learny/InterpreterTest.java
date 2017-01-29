@@ -44,7 +44,7 @@ public class InterpreterTest {
     public void testAnalyzeTest() throws Exception{
         System.out.println("analyzeTest");
         Interpreter instance = new Interpreter();
-        instance.analyzeTest();
+        instance.analyze("");
         // TODO review the generated test code and remove the default call to fail.
         fail("The test case is a prototype.");
     }
