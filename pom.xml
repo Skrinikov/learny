@@ -187,6 +187,12 @@
             <version>1.0.2</version>
             <scope>compile</scope>
         </dependency>
+        
+        <dependency>
+            <groupId>com.textrazor</groupId>
+            <artifactId>textrazor</artifactId>
+            <version>1.0.10</version>
+        </dependency>
     </dependencies>
     <!-- Information for compiling, testing and packaging are define here -->
     <build>
