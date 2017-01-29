@@ -39,7 +39,6 @@ public class Interpreter {
     }
 
     public void analyzeTest() {
-        System.out.println("ENTERING ANALYZE");
         //String testString="This is a  test produced Saturday January 28, 2017 at McHacks2k17.";
         //String testString="The chancellor has postponed the sale of the government's final stake in Lloyds Banking Group";
         //String testString="The economic growth of the population of India.";
@@ -99,6 +98,8 @@ public class Interpreter {
             String temp;
             List<String> properNames = new ArrayList<>();
             for (Sentence se : rp.getSentences()) {
+                analyzeSentence(se);
+                /*
                 for (Word w : se.getWords()) {
                     if (w.getNounPhrases().size() != 0) {
                         temp = retrieveNouns(w.getNounPhrases().get(0));
@@ -114,26 +115,15 @@ public class Interpreter {
                     }
                 }
                 properNames = tempList;
-                /*
-                Set<String> nounsSet=new HashSet<>();
-                nounsSet.addAll(properNames);
-                properNames.clear();
-                properNames.addAll(nounsSet);
-                 */
-            }
-            for (int i = properNames.size() - 1; i > -1; i--) {
-                System.out.println("NOUNS: " + properNames.get(i));
-            }
+            */}
+           /*for(String s : properNames){
+               System.out.println("NP: "+s);
+           }*/
 
         } catch (Exception e) {
             System.out.println("ERROR -" + e.getMessage() + e.getClass());
         }
 
-    }
-
-    private void testRetrieveNNP(Word np) {
-        System.out.println("IN TEST RETRIEVE");
-        System.out.println(retrieveProperNoun(np));
     }
 
     private String retrieveSentence(Sentence sentence) {
@@ -143,16 +133,7 @@ public class Interpreter {
         }
         return sent;
     }
-
-    private boolean isDate(Entity entity) {
-        for (String type : entity.getDBPediaTypes()) {
-            if (type.equalsIgnoreCase("time")) {
-                return true;
-            }
-        }
-        return false;
-    }
-
+    
     /**
      * NOT WORKING
      *
@@ -185,7 +166,9 @@ public class Interpreter {
 
     private boolean isDTorJJ(Word word) {
         String jjRegex = "JJ[S]?\\b";
-        if (word.getPartOfSpeech().equals("JJ") || word.getPartOfSpeech().matches(jjRegex)) {
+        
+        if (word.getPartOfSpeech().equals("DT") 
+                || word.getPartOfSpeech().matches(jjRegex)) {
             return true;
         }
         return false;
@@ -209,61 +192,7 @@ public class Interpreter {
                 nouns += w.getToken() + " ";
             }
         }
-
         return nouns.trim();
-        /*
-        for(Word s : words){
-            System.out.println("WORD: "+s.getToken());
-        }*/
-        //List<String> nounList=new ArrayList<>();
-        //int nnpCtr=0;
-        //List<String> nnpIndexes=new ArrayList<>();
-        /*
-        for(int i=0;i<words.size();i++){
-            if(isProperNoun(words.get(i))){
-                nnpIndexes.add(i+"");
-                nnpCtr++;
-            }*///else
-        // i++;
-        /* System.out.println("NNPCTR: "+nnpCtr+" I:"+i );
-        }
-        System.out.println("NNPCTR: "+nnpCtr + " WORDSSIZE: "+words.size());
-        if(nnpCtr<words.size()){
-            System.out.println("IN LOOP");
-            String tempNoun="";
-            int index1=0;
-            int index2=0;
-            for(int i=0;i<nnpIndexes.size();i++){
-                 index1=Integer.parseInt(nnpIndexes.get(i));
-                if((i++) < nnpIndexes.size())
-                    index2=Integer.parseInt(nnpIndexes.get(i++));
-                System.out.println("VALUE OF INDEX1: "+index1+" AND INDEX2:"+index2);
-                //i=index2-1;
-                if((index2-index1) > 1){
-                    if(!tempNoun.isEmpty()){
-                        nounList.add(tempNoun);
-                        tempNoun="";
-                    }
-                    nounList.add(words.get(index1).getToken());
-                    nnpIndexes.remove(i);
-                }else{
-                    tempNoun+= words.get(index1).getToken()+" ";
-                    nnpIndexes.remove(i);
-                }
-                i--;
-            }
-        }else{
-            System.out.println("IN ELSE");
-            String noun="";
-            for(String index : nnpIndexes){
-                noun+=words.get(Integer.parseInt(index))+" ";
-            }
-            noun=noun.trim();
-            nounList.add(noun);
-        }
-        System.out.println("LEAVING NOUNS: "+nounList.size());
-        return nounList;
-         */
     }
 
     private String retrieveProperNoun(Word word) {
@@ -344,9 +273,11 @@ public class Interpreter {
         List<String> subjects = new ArrayList<>();
         if (entities != null) {
             for (Entity entity : entities) {
-                if (entity.getRelevanceScore() > 0.4 && entity.getConfidenceScore() > 2) {
+                if (entity.getRelevanceScore() > 0.4 
+                        && entity.getConfidenceScore() > 2) {
                     if (!listContains(subjects, entity.getMatchedText())) {
-                        System.out.println("Entity: " + entity.getMatchedText() + " - Score: " + entity.getRelevanceScore());
+                        System.out.println("Entity: " + entity.getMatchedText() 
+                                + " - Score: " + entity.getRelevanceScore());
                         subjects.add(entity.getMatchedText());
                     }
                 }
@@ -373,55 +304,6 @@ public class Interpreter {
         return false;
     }
 
-    /*
-    private String retrieveProperNoun(Word word) {
-        String properNoun = "";
-        int nnpCtr=0;
-        List<String> nnpIndexes=new ArrayList<>();
-        //int primaryWordIndex=word.getPosition();
-        if (word.getPartOfSpeech().matches("NNP[S]?\\b")) {
-            nnpCtr++;
-            nnpIndexes.add(word.getPosition()+"");
-            if (word.getNounPhrases() == null) {
-                properNoun = word.getToken();
-            } else {
-                for (NounPhrase np : word.getNounPhrases()) {
-                    for (Word npw : np.getWords()) {
-                        if(!nnpIndexes.contains(npw.getPosition()+"")){
-                            if (npw.getPartOfSpeech().matches("NNP[S]?\\b")) {
-                            nnpCtr++;
-                            nnpIndexes.add(npw.getPosition()+"");
-                        }
-                        
-                            /*
-                            int tempWordIndex=npw.getPosition();
-                            if(tempWordIndex == primaryWordIndex -1){
-                                properNoun= npw.getToken()+" "+properNoun;
-                            }else if(tempWordIndex == primaryWordIndex+1){
-                                properNoun+=" "+npw.getToken();
-                            }
-                            //properNoun+=" "+word.getToken();
-                            
-                        }
-                    }
-                    if(nnpCtr>1){
-                        System.out.println("SHOWING INDEX LIST WITH SIZE: "+nnpIndexes.size());
-                        for(String s : nnpIndexes){
-                            System.out.println("INDEX: "+s);
-                        }
-  
-                    }
-                }
-            }
-        }
-        return properNoun;
-    }*/
- /*
-    private String retrieveNounPhrase(Word word){
-        for(NounPhrase np:word.getNounPhrases()){
-            
-        }
-    }*/
     private void analyzeSentence(Sentence se) {
         boolean hasNumber = false;
         boolean hasName = false;
