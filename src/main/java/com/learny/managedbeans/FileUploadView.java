@@ -1,5 +1,6 @@
 package com.learny.managedbeans;
  
+import com.learny.learny.Interpreter;
 import java.util.ArrayList;
 import java.util.List;
 import javax.faces.application.FacesMessage;
@@ -20,7 +21,11 @@ public class FileUploadView {
         /*FacesMessage message = new FacesMessage("Succesful", fileContents + " is uploaded.");
         FacesContext.getCurrentInstance().addMessage(null, message);*/
         
-        data.add(fileContents);
+        Interpreter itr = new Interpreter();
+        
+        data = itr.analyze(fileContents);
+        if(data.size() == 0)
+            data.add("No values were found.");
     }
 
     public List<String> getData() {
