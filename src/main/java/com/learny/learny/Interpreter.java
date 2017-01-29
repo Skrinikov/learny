@@ -313,6 +313,63 @@ public class Interpreter {
         }
         return false;
     }
+    
+    /**
+     * Retrives the relevant keywords of the document.
+     * @param text String
+     * @return List of keywords
+     */
+    public List<String> getKeyWords(String text) {
+        List<String> keywords = new ArrayList<>();
+        
+        try {
+            AnalyzedText at = tr.analyze(text);
+            keywords = getMostRelevantEntities(at.getResponse());
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+        }
+        
+        return keywords;
+    }
+    
+    /**
+     * Extract relevant keywords from the input text 
+     * @param rp Response
+     * @return List of keywords
+     */
+    private List<String> getMostRelevantEntities(Response rp){
+        List<Entity> entities =  rp.getEntities();
+        List<String> subjects = new ArrayList<>();
+        if (entities != null)
+        {
+            for(Entity entity : entities){
+                if (entity.getRelevanceScore() > 0.4 && entity.getConfidenceScore() > 2)
+                {
+                    if (!listContains(subjects, entity.getMatchedText())){
+                        System.out.println("Entity: " + entity.getMatchedText() + " - Score: "+ entity.getRelevanceScore() );
+                        subjects.add(entity.getMatchedText());
+                    }
+                }
+            }
+        }
+        
+        return subjects;
+        
+    }
+    
+    /**
+     * Check if list contains a certain value
+     * @param set
+     * @param value
+     * @return 
+     */
+    private boolean listContains (List<String> set, String value){
+        for (String data : set){
+            if (data.equalsIgnoreCase(value))
+                return true;
+        }
+        return false;
+    }
 
     /*
     private String retrieveProperNoun(Word word) {
