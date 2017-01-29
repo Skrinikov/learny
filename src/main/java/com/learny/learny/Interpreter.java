@@ -443,7 +443,7 @@ public class Interpreter {
    }
 
     /**
-     * Please work.
+     * Check if the inputed sentence contains a Time type entity.
      *
      * @param se
      * @return
